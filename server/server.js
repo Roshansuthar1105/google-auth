@@ -46,7 +46,9 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/api/users', require('./routes/users'));
 
 // Serve static assets in production
-if (process.env.NODE_ENV === 'production') {
+// Note: For deployed app, we're not serving static files from Express
+// since frontend is on Netlify and backend is on Render
+if (process.env.NODE_ENV === 'production' && process.env.SERVE_STATIC === 'true') {
   app.use(express.static(path.join(__dirname, '../client/dist')));
 
   app.get('*', (req, res) => {

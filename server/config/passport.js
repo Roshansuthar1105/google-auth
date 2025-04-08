@@ -9,12 +9,15 @@ module.exports = function(passport) {
   console.log('Client Secret:', process.env.GOOGLE_CLIENT_SECRET ? 'Is set (starts with ' + process.env.GOOGLE_CLIENT_SECRET.substring(0, 5) + '...)' : 'Not set');
   console.log('Callback URL:', '/api/auth/google/callback');
 
-  // Determine the correct callback URL based on environment
-  const callbackURL = process.env.NODE_ENV === 'production'
-    ? 'https://google-auth-htqg.onrender.com/api/auth/google/callback'
-    : '/api/auth/google/callback';
+  // For Google OAuth, we need to use a relative path for the callback URL
+  // The absolute URL is set in the Google Cloud Console
+  const callbackURL = '/api/auth/google/callback';
 
   console.log('Using callback URL:', callbackURL);
+  console.log('Full callback URL (for Google Cloud Console):',
+    process.env.NODE_ENV === 'production'
+      ? 'https://google-auth-htqg.onrender.com/api/auth/google/callback'
+      : 'http://localhost:5000/api/auth/google/callback');
 
   passport.use(
     new GoogleStrategy(

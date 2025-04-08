@@ -60,12 +60,16 @@ const Login = () => {
 
   const handleGoogleLogin = () => {
     try {
-      // const googleAuthUrl = `${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/auth/google`;
-      const googleAuthUrl = `${import.meta.env.VITE_API_URL}/auth/google`;
+      // Make sure we're using the correct API URL
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+      const googleAuthUrl = `${apiUrl}/auth/google`;
       console.log('Redirecting to Google OAuth URL:', googleAuthUrl);
 
       // Add a timestamp to avoid caching issues
       const urlWithTimestamp = `${googleAuthUrl}?t=${Date.now()}`;
+      console.log('Final redirect URL:', urlWithTimestamp);
+
+      // Redirect to Google OAuth
       window.location.href = urlWithTimestamp;
     } catch (error) {
       console.error('Error redirecting to Google OAuth:', error);
