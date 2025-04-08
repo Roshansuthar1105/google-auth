@@ -9,12 +9,19 @@ module.exports = function(passport) {
   console.log('Client Secret:', process.env.GOOGLE_CLIENT_SECRET ? 'Is set (starts with ' + process.env.GOOGLE_CLIENT_SECRET.substring(0, 5) + '...)' : 'Not set');
   console.log('Callback URL:', '/api/auth/google/callback');
 
+  // Determine the correct callback URL based on environment
+  const callbackURL = process.env.NODE_ENV === 'production'
+    ? 'https://google-auth-htqg.onrender.com/api/auth/google/callback'
+    : '/api/auth/google/callback';
+
+  console.log('Using callback URL:', callbackURL);
+
   passport.use(
     new GoogleStrategy(
       {
         clientID: process.env.GOOGLE_CLIENT_ID,
         clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-        callbackURL: '/api/auth/google/callback',
+        callbackURL: callbackURL,
         proxy: true
       },
       async (accessToken, refreshToken, profile, done) => {

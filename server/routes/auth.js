@@ -67,22 +67,32 @@ router.get(
         expiresIn: process.env.JWT_EXPIRE
       });
 
-      // Set cookie - make it accessible to JavaScript for Google OAuth flow
-      res.cookie('token', token, {
-        expires: new Date(
-          Date.now() + process.env.JWT_COOKIE_EXPIRE * 24 * 60 * 60 * 1000
-        ),
-        httpOnly: false, // Allow JavaScript access
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax' // Allow cross-site cookie for the redirect
-      });
+      // For production deployment with different domains, we need to handle cookies differently
+      if (process.env.NODE_ENV === 'production') {
+        // In production, we'll redirect with the token in the URL
+        // This is because cross-domain cookies won't work between Netlify and Render
+        const redirectUrl = `${process.env.CLIENT_URL}/auth-callback?token=${token}`;
+        console.log('Production redirect with token in URL:', redirectUrl);
+        return res.redirect(redirectUrl);
+      } else {
+        // In development, we can use cookies
+        res.cookie('token', token, {
+          expires: new Date(
+            Date.now() + process.env.JWT_COOKIE_EXPIRE * 24 * 60 * 60 * 1000
+          ),
+          httpOnly: false, // Allow JavaScript access
+          secure: false,
+          sameSite: 'lax' // Allow cross-site cookie for the redirect
+        });
+        console.log('Development: Token set in cookie:', token.substring(0, 10) + '...');
+      }
 
-      console.log('Token set in cookie:', token.substring(0, 10) + '...');
-
-      // Redirect to frontend
-      const redirectUrl = `${process.env.CLIENT_URL}/dashboard`;
-      console.log('Redirecting to:', redirectUrl);
-      res.redirect(redirectUrl);
+      // Redirect to frontend (only for development, production redirect is handled above)
+      if (process.env.NODE_ENV !== 'production') {
+        const redirectUrl = `${process.env.CLIENT_URL}/dashboard`;
+        console.log('Development: Redirecting to:', redirectUrl);
+        res.redirect(redirectUrl);
+      }
     } catch (error) {
       console.error('Error in callback handler:', error);
       res.redirect(`${process.env.CLIENT_URL}/login?error=auth_failed`);

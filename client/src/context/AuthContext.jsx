@@ -23,42 +23,43 @@ export const AuthProvider = ({ children }) => {
     return null;
   };
 
+  // Function to load user data
+  const loadUser = async () => {
+    try {
+      // Check if token exists in localStorage or cookies
+      let token = localStorage.getItem('token');
+
+      // If not in localStorage, check cookies (for Google OAuth)
+      if (!token) {
+        token = getTokenFromCookies();
+        // If found in cookies, also save to localStorage for future use
+        if (token) {
+          localStorage.setItem('token', token);
+          console.log('Token found in cookies and saved to localStorage');
+        }
+      }
+
+      if (!token) {
+        console.log('No authentication token found');
+        setIsLoading(false);
+        return;
+      }
+
+      console.log('Token found, fetching user data...');
+      const response = await authAPI.getCurrentUser();
+      console.log('User data received:', response.data);
+      setUser(response.data.data);
+      setIsAuthenticated(true);
+    } catch (err) {
+      console.error('Error loading user:', err);
+      localStorage.removeItem('token');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   // Load user on initial render
   useEffect(() => {
-    const loadUser = async () => {
-      try {
-        // Check if token exists in localStorage or cookies
-        let token = localStorage.getItem('token');
-
-        // If not in localStorage, check cookies (for Google OAuth)
-        if (!token) {
-          token = getTokenFromCookies();
-          // If found in cookies, also save to localStorage for future use
-          if (token) {
-            localStorage.setItem('token', token);
-            console.log('Token found in cookies and saved to localStorage');
-          }
-        }
-
-        if (!token) {
-          console.log('No authentication token found');
-          setIsLoading(false);
-          return;
-        }
-
-        console.log('Token found, fetching user data...');
-        const response = await authAPI.getCurrentUser();
-        console.log('User data received:', response.data);
-        setUser(response.data.data);
-        setIsAuthenticated(true);
-      } catch (err) {
-        console.error('Error loading user:', err);
-        localStorage.removeItem('token');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     loadUser();
   }, []);
 
@@ -149,7 +150,12 @@ export const AuthProvider = ({ children }) => {
 
   // Update user in context after profile update
   const updateUser = (updatedUser) => {
-    setUser(updatedUser);
+    if (updatedUser) {
+      setUser(updatedUser);
+    } else {
+      // If no user data provided, reload user data from API
+      loadUser();
+    }
   };
 
   return (

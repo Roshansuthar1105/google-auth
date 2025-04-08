@@ -7,6 +7,7 @@ import Register from './pages/Register';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import Dashboard from './pages/Dashboard';
+import AuthCallback from './pages/AuthCallback';
 import './index.css';
 
 function App() {
@@ -23,6 +24,7 @@ function App() {
               <Route path="/register" element={<Register />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/reset-password/:resetToken" element={<ResetPassword />} />
+              <Route path="/auth-callback" element={<AuthCallback />} />
 
               {/* Protected routes */}
               <Route element={<ProtectedRoute />}>
