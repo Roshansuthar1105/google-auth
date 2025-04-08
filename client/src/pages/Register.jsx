@@ -74,7 +74,8 @@ const Register = () => {
 
   const handleGoogleLogin = () => {
     try {
-      const googleAuthUrl = `${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/auth/google`;
+      // const googleAuthUrl = `${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/auth/google`;
+      const googleAuthUrl = `${import.meta.env.VITE_API_URL}/auth/google`;
       console.log('Redirecting to Google OAuth URL:', googleAuthUrl);
 
       // Add a timestamp to avoid caching issues
